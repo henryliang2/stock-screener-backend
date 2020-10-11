@@ -15,32 +15,18 @@ app.use(cors());
 
 const runApiCalls = async (queryOptions, initialValue) => {
 
-  let count = 0; // number of total results
-  let tickers = [];
+  const response = await fetch(`https://finviz.com/screener.ashx?v=111&f=${queryOptions}&r=${initialValue}`);
+  const html = await response.text();
+  const dom = new JSDOM(html);
 
-  const getCompanyData = async (tickers) => {
-    const array = tickers.join(',');
-    const jsonData = await fetch(`https://financialmodelingprep.com/api/v3/profile/${array}?apikey=${process.env.REACT_APP_FMP_API_KEY}`);
-    return jsonData;
-  }
-  const getCompanies = async (startNum) => {
-    console.log(startNum)
-    const response = await fetch(`https://finviz.com/screener.ashx?v=111&f=${queryOptions}&r=${startNum}`);
-    const html = await response.text();
-    const dom = new JSDOM(html);
+  const htmlElements = Array.from(dom.window.document.getElementsByClassName('screener-link-primary'));
+  const countString = Array.from(dom.window.document.getElementsByClassName('count-text'))[0].textContent.split(' ')[1];
+  const count = parseInt(countString);
 
-    const htmlElements = Array.from(dom.window.document.getElementsByClassName('screener-link-primary'));
-    const countString = Array.from(dom.window.document.getElementsByClassName('count-text'))[0].textContent.split(' ')[1];
-    count = parseInt(countString);
-
-    htmlElements.forEach(node => {
-      tickers.push(node.textContent);
-    })
-    const jsonData = await getCompanyData(tickers) 
-    return jsonData;
-  }
-  const data = await getCompanies(initialValue);
-  return data;
+  const tickers = htmlElements.map(node => node.textContent).join(',');
+  
+  const jsonData = await fetch(`https://financialmodelingprep.com/api/v3/profile/${tickers}?apikey=${process.env.REACT_APP_FMP_API_KEY}`);
+  return jsonData;
 }
 
 const getCompanyNews = async (ticker) => {
@@ -57,6 +43,9 @@ const getCompanyNews = async (ticker) => {
   .then(jsonData => jsonData.json())
   .then(articles => {
     const returnArray = articles.slice(0, 9);
+    returnArray.forEach((article, i) => {
+      article.summary = article.summary.slice(0, 480) + '...';
+    });
     return  { "newsArray": returnArray }
   })
 
