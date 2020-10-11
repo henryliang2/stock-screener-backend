@@ -13,7 +13,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(cors());
 
-const runApiCalls = async (queryOptions) => {
+const runApiCalls = async (queryOptions, initialValue) => {
 
   let count = 0; // number of total results
   let tickers = [];
@@ -23,8 +23,9 @@ const runApiCalls = async (queryOptions) => {
     const jsonData = await fetch(`https://financialmodelingprep.com/api/v3/profile/${array}?apikey=${process.env.REACT_APP_FMP_API_KEY}`);
     return jsonData;
   }
-  const getCompanies = async (initialValue = 1) => {
-    const response = await fetch(`https://finviz.com/screener.ashx?v=111&f=${queryOptions}&r=${initialValue}`);
+  const getCompanies = async (startNum) => {
+    console.log(startNum)
+    const response = await fetch(`https://finviz.com/screener.ashx?v=111&f=${queryOptions}&r=${startNum}`);
     const html = await response.text();
     const dom = new JSDOM(html);
 
@@ -38,7 +39,7 @@ const runApiCalls = async (queryOptions) => {
     const jsonData = await getCompanyData(tickers) 
     return jsonData;
   }
-  const data = await getCompanies();
+  const data = await getCompanies(initialValue);
   return data;
 }
 
@@ -67,7 +68,7 @@ app.get('/', (req, res) => {
 })
 
 app.post('/search', (req, res) => {
-  runApiCalls(req.body.queryOptions)
+  runApiCalls(req.body.queryOptions, req.body.initialValue)
   .then(jsonData => jsonData.json())
   .then(data => { res.send(data) });
 })
@@ -79,5 +80,5 @@ app.post('/companynews', (req, res) => {
 })
 
 app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`)
+  console.log(`listening on http://localhost:${port}`)
 })
