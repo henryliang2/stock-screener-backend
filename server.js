@@ -1,20 +1,65 @@
 const express = require('express');
 const cors = require('cors');
+const passport = require('passport');
+const GoogleStrategy = require('passport-google-oauth20');
 const fetch = require('node-fetch');
 const bodyParser = require('body-parser');
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
-require('dotenv').config();
+require('dotenv').config(); 
+
+// initialize express
 
 const app = express();
 const port = 3001;
 
+// Passport setup
+
+let user = {};
+
+passport.serializeUser((user, cb) => {
+  cb(null, user);
+});
+
+passport.deserializeUser((user, cb) => {
+  cb(null, user);
+});
+
+passport.use(new GoogleStrategy({
+    clientID: process.env.PASSPORT_GOOGLE_CLIENT_ID,
+    clientSecret: process.env.PASSPORT_GOOGLE_CLIENT_SECRET,
+    callbackURL: '/auth/google/callback'
+  },
+  (accessToken, refreshToken, profile, cb) => {
+    user = {...profile};
+    return cb(null, profile);
+  }
+))
+
+// Middleware
+
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors());
+app.use(passport.initialize());
+
+// Routes
 
 app.get('/', (req, res) => {
-  console.log('hello world')
+  console.log('Hello World')
+})
+
+app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+app.get('/auth/google/callback', 
+  passport.authenticate('google', { failureRedirect: 'http://localhost:3000/' }), 
+  (req, res) => {
+    user = req.user;
+    res.redirect('http://localhost:3000/search')
+  });
+
+app.get('/user', (req, res) => {
+  res.send(user);
 })
 
 app.get('/search/:initialValue/:queryOptions?', async (req, res) => {
