@@ -1,11 +1,11 @@
 const express = require('express');
 const cors = require('cors');
-const passport = require('passport');
-const GoogleStrategy = require('passport-google-oauth20');
 const fetch = require('node-fetch');
 const bodyParser = require('body-parser');
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
+const mongoose = require('mongoose');
+const User = require('./models/User.js');
 require('dotenv').config(); 
 
 // initialize express
@@ -13,35 +13,21 @@ require('dotenv').config();
 const app = express();
 const port = 3001;
 
-// Passport setup
+// MongoDB + Mongoose
 
-let user = {};
-
-passport.serializeUser((user, cb) => {
-  cb(null, user);
+mongoose.connect(`mongodb+srv://zomgitshenry:${process.env.REACT_APP_MONGODB_KEY}@cluster0.gy4ko.mongodb.net/stocksurfer?retryWrites=true&w=majority`, 
+  {useNewUrlParser: true, useUnifiedTopology: true});
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function() {
+  console.log('MongoDB Connected');
 });
-
-passport.deserializeUser((user, cb) => {
-  cb(null, user);
-});
-
-passport.use(new GoogleStrategy({
-    clientID: process.env.PASSPORT_GOOGLE_CLIENT_ID,
-    clientSecret: process.env.PASSPORT_GOOGLE_CLIENT_SECRET,
-    callbackURL: '/auth/google/callback'
-  },
-  (accessToken, refreshToken, profile, cb) => {
-    user = {...profile};
-    return cb(null, profile);
-  }
-))
 
 // Middleware
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors());
-app.use(passport.initialize());
 
 // Routes
 
@@ -49,17 +35,16 @@ app.get('/', (req, res) => {
   console.log('Hello World')
 })
 
-app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+app.get('/sync/:googleId', (req, res) => {
+  User.findOne({userId: req.params.googleId})
+  .then(user => {console.log(user); res.send(user)});
+})
 
-app.get('/auth/google/callback', 
-  passport.authenticate('google', { failureRedirect: 'http://localhost:3000/' }), 
-  (req, res) => {
-    user = req.user;
-    res.redirect('http://localhost:3000/search')
-  });
-
-app.get('/user', (req, res) => {
-  res.send(user);
+app.post('/set', (req, res) => {
+  User.findOneAndUpdate(
+    { userId: req.body.googleId },
+    {$set: { stocks: req.body.stocks }}
+  ).then(console.log)
 })
 
 app.get('/search/:initialValue/:queryOptions?', async (req, res) => {
