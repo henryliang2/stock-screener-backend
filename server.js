@@ -70,6 +70,14 @@ app.get('/search/:initialValue/:queryOptions?', async (req, res) => {
   res.send(JSON.stringify({ stockData, totalResultCount }));
 })
 
+app.get('/companies/:tickers', async (req, res) => {
+  const { tickers } = req.params;
+  const fmpResponse = await fetch(`https://financialmodelingprep.com/api/v3/profile/${tickers}?apikey=${process.env.REACT_APP_FMP_API_KEY}`);
+  const stockData = await fmpResponse.json();
+
+  res.send(JSON.stringify({ stockData }));
+})
+
 app.get('/companynews/:ticker', async (req, res) => {
   const dateCurr = new Date().toISOString().slice(0, 10);
   let dateOld = new Date();
@@ -86,7 +94,7 @@ app.get('/companynews/:ticker', async (req, res) => {
   returnArray.forEach((article, i) => {
     article.summary = article.summary.slice(0, 480) + '...';
   });
-  const returnData = JSON.stringify({ "newsArray": returnArray });
+  const returnData = JSON.stringify({ newsArray: returnArray });
   res.send(returnData);
 })
 
