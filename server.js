@@ -15,6 +15,7 @@ require('dotenv').config();
 // initialize express
 
 const app = express();
+const port = process.env.PORT || 3000;
 
 // Passport Configuration
 
@@ -178,6 +179,6 @@ app.get('/companynews/:ticker', async (req, res) => {
   }
 })
 
-app.listen(process.env.PORT || 3000, () => {
-  console.log(`listening on http://localhost:${PORT}`)
+app.listen(port, () => {
+  console.log(`listening on http://localhost:${port}`)
 })
