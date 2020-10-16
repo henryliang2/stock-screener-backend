@@ -52,8 +52,11 @@ passport.deserializeUser((id, done) => {
 
 // MongoDB + Mongoose
 
-mongoose.connect(`mongodb+srv://zomgitshenry:${process.env.REACT_APP_MONGODB_KEY}@cluster0.gy4ko.mongodb.net/stocksurfer?retryWrites=true&w=majority`, 
-  {useNewUrlParser: true, useUnifiedTopology: true});
+mongoose.connect(`mongodb+srv://zomgitshenry:${process.env.REACT_APP_MONGODB_KEY}@cluster0.gy4ko.mongodb.net/stocksurfer?retryWrites=true&w=majority`, { 
+    useNewUrlParser: true, 
+    useUnifiedTopology: true, 
+    useFindAndModify: false 
+  });
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function() {
@@ -138,6 +141,7 @@ app.get('/search/:initialValue/:queryOptions?', async (req, res) => {
 
   const fmpResponse = await fetch(`https://financialmodelingprep.com/api/v3/profile/${tickers}?apikey=${process.env.REACT_APP_FMP_API_KEY}`);
   const stockData = await fmpResponse.json();
+  console.log(stockData);
 
   res.send(JSON.stringify({ stockData, totalResultCount }));
 })
@@ -146,6 +150,7 @@ app.get('/companies/:tickers', async (req, res) => {
   const { tickers } = req.params;
   const fmpResponse = await fetch(`https://financialmodelingprep.com/api/v3/profile/${tickers}?apikey=${process.env.REACT_APP_FMP_API_KEY}`);
   const stockData = await fmpResponse.json();
+  console.log(stockData)
 
   res.send(JSON.stringify({ stockData }));
 })
@@ -157,17 +162,21 @@ app.get('/companynews/:ticker', async (req, res) => {
   dateOld = dateOld.toISOString().slice(0, 10);
   const dateQuery = `&from=${dateOld}&to=${dateCurr}`;
 
-  const finnhubData = await fetch(`https://finnhub.io/api/v1/company-news?symbol=${req.params.ticker}${dateQuery}`, {
-    method: 'GET',
-    headers: { 'X-Finnhub-Token' : process.env.REACT_APP_FINNHUB_API_KEY }
-  })
-  const articles = await finnhubData.json();
-  const returnArray = articles.slice(0, 9);
-  returnArray.forEach((article, i) => {
-    article.summary = article.summary.slice(0, 480) + '...';
-  });
-  const returnData = JSON.stringify({ newsArray: returnArray });
-  res.send(returnData);
+  try {
+    const finnhubData = await fetch(`https://finnhub.io/api/v1/company-news?symbol=${req.params.ticker}${dateQuery}`, {
+      method: 'GET',
+      headers: { 'X-Finnhub-Token' : process.env.REACT_APP_FINNHUB_API_KEY }
+    })
+    const articles = await finnhubData.json();
+    const returnArray = articles.slice(0, 9);
+    returnArray.forEach((article, i) => {
+      article.summary = article.summary.slice(0, 480) + '...';
+    });
+    const returnData = JSON.stringify({ newsArray: returnArray });
+    res.send(returnData);
+  } catch(err) {
+    console.log(err);
+  }
 })
 
 app.listen(port, () => {
