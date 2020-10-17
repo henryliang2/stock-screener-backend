@@ -78,7 +78,7 @@ app.use(passport.session())
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors({
-  origin: "https://stock-surfer.netlify.app/",
+  origin: "https://stock-surfer.netlify.app",
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true,
 }));
@@ -90,8 +90,8 @@ app.get('/auth/google',
 
 app.get('/auth/google/callback', 
   passport.authenticate('google', { 
-    successRedirect: 'https://stock-surfer.netlify.app/',
-    failureRedirect: 'https://stock-surfer.netlify.app/' 
+    successRedirect: 'https://stock-surfer.netlify.app',
+    failureRedirect: 'https://stock-surfer.netlify.app' 
   }),
   (req, res) => {
     res.redirect('/');
