@@ -104,26 +104,27 @@ app.get("/auth/logout", (req, res) => {
 
 // API Routes
 
-app.get('/', (req, res) => {
-  res.send('Hello World');
-})
-
+// Fetch user profile on user sign-in
 app.get('/sync', (req, res) => {
-  if(!req.user) { res.send({}); return null };
+  if(!req.user) { 
+    res.send({}); 
+    return null 
+  };
 
   User.findOne({userId: req.user.userId})
   .then(user => { res.send(user) });
 })
 
+// Update database when user adds/removes stocks from collecton
 app.post('/set', (req, res) => {
   User.findOneAndUpdate(
     { userId: req.user.userId },
-    {$set: { stocks: req.body.stocks }}
+    { $set: { stocks: req.body.stocks } }
   ).then(console.log)
 })
 
+// Query Finviz, then return a list of stocks matching constraints
 app.get('/search/:initialValue/:queryOptions?', async (req, res) => {
-
   const { queryOptions, initialValue } = req.params;
 
   const finvizResponse = await fetch(`https://finviz.com/screener.ashx?v=111&f=${queryOptions}&r=${initialValue}`);
@@ -146,6 +147,7 @@ app.get('/search/:initialValue/:queryOptions?', async (req, res) => {
   res.send(JSON.stringify({ stockData, totalResultCount }));
 })
 
+// Fetch data from FinancialModelingPrep for a list of companies 
 app.get('/companies/:tickers', async (req, res) => {
   const { tickers } = req.params;
   const fmpResponse = await fetch(`https://financialmodelingprep.com/api/v3/profile/${tickers}?apikey=${process.env.REACT_APP_FMP_API_KEY}`);
@@ -155,6 +157,7 @@ app.get('/companies/:tickers', async (req, res) => {
   res.send(JSON.stringify({ stockData }));
 })
 
+// Fetch news articles for a company by ticker
 app.get('/companynews/:ticker', async (req, res) => {
   const dateCurr = new Date().toISOString().slice(0, 10);
   let dateOld = new Date();
