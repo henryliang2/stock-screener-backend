@@ -175,7 +175,7 @@ app.get('/companynews/:ticker', async (req, res) => {
     returnArray.forEach((article, i) => {
       article.summary = article.summary.slice(0, 480) + '...';
     });
-    returnArray = returnArray.filter(article => article.image);
+    returnArray = returnArray.filter(article => article.image != null);
     const returnData = JSON.stringify({ newsArray: returnArray });
     res.send(returnData);
   } catch(err) {
