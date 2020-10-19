@@ -171,10 +171,11 @@ app.get('/companynews/:ticker', async (req, res) => {
       headers: { 'X-Finnhub-Token' : process.env.REACT_APP_FINNHUB_API_KEY }
     })
     const articles = await finnhubData.json();
-    const returnArray = articles.slice(0, 9);
+    let returnArray = articles.slice(0, 9);
     returnArray.forEach((article, i) => {
       article.summary = article.summary.slice(0, 480) + '...';
     });
+    returnArray.filter(article => article.image);
     const returnData = JSON.stringify({ newsArray: returnArray });
     res.send(returnData);
   } catch(err) {
