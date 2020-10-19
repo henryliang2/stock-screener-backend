@@ -82,6 +82,7 @@ app.use(cors({
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true,
 }));
+app.use(express.static('public'));
 
 // Passport Routes
 
@@ -173,9 +174,11 @@ app.get('/companynews/:ticker', async (req, res) => {
     const articles = await finnhubData.json();
     let returnArray = articles.slice(0, 9);
     returnArray.forEach((article, i) => {
-      article.summary = article.summary.slice(0, 480) + '...';
+      article.summary = article.summary.slice(0, 480) + '...'; // shorten description
+      if (article.image === 'null') {
+        article.image = 'https://stocksurfer-server.herokuapp.com/stocksurfer.png'
+      }
     });
-    returnArray = returnArray.filter(article => article.image != null);
     const returnData = JSON.stringify({ newsArray: returnArray });
     res.send(returnData);
   } catch(err) {
