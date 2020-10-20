@@ -162,7 +162,7 @@ app.get('/quote/:ticker', async(req, res) => {
   const fmpResponse = await fetch(`https://financialmodelingprep.com/api/v3/historical-price-full/${ticker}?serietype=line&apikey=${process.env.REACT_APP_FMP_API_KEY}`)
   const responseData = await fmpResponse.json();
   const quoteData = [...responseData.historical].slice(0, 255);
-  res.send(JSON.stringify(quoteData));
+  res.send(JSON.stringify({ quoteData }));
 })
 
 // Fetch news articles for a company by ticker
