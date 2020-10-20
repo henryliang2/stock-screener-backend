@@ -154,8 +154,15 @@ app.get('/companies/:tickers', async (req, res) => {
   const fmpResponse = await fetch(`https://financialmodelingprep.com/api/v3/profile/${tickers}?apikey=${process.env.REACT_APP_FMP_API_KEY}`);
   const stockData = await fmpResponse.json();
   console.log(stockData)
-
   res.send(JSON.stringify({ stockData }));
+})
+
+app.get('/quote/:ticker', async(req, res) => {
+  const { ticker } = req.params;
+  const fmpResponse = await fetch(`https://financialmodelingprep.com/api/v3/historical-price-full/${ticker}?serietype=line&apikey=${process.env.REACT_APP_FMP_API_KEY}`)
+  const responseData = await fmpResponse.json();
+  const quoteData = [...responseData.historical].slice(0, 255);
+  res.send(JSON.stringify(quoteData));
 })
 
 // Fetch news articles for a company by ticker
