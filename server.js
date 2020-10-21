@@ -77,6 +77,7 @@ app.use(cors({
   credentials: true,
 }));
 app.use(express.static('public'));
+app.enable("trust proxy");
 
 // Passport Routes
 
