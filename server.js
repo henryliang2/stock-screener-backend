@@ -67,7 +67,8 @@ app.use(
   cookieSession({
     name: "session",
     keys: [process.env.REACT_APP_SESSION_SECRET],
-    maxAge: 24 * 60 * 60 * 100
+    maxAge: 24 * 60 * 60 * 100,
+    secure: true;
   })
 );
 app.use(cookieParser());
