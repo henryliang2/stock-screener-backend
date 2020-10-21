@@ -72,7 +72,7 @@ app.use(passport.session())
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors({
-  origin: "http://localhost:3000",
+  origin: "https://stock-surfer.netlify.app",
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true,
 }));
@@ -85,8 +85,8 @@ app.get('/auth/google',
 
 app.get('/auth/google/callback', 
   passport.authenticate('google', { 
-    successRedirect: 'http://localhost:3000',
-    failureRedirect: '/' 
+    successRedirect: 'https://stock-surfer.netlify.app',
+    failureRedirect: 'https://stock-surfer.netlify.app' 
   }),
   (req, res) => {
     res.redirect('/');
@@ -94,7 +94,7 @@ app.get('/auth/google/callback',
 
 app.get("/auth/logout", (req, res) => {
   req.logout();
-  res.redirect('http://localhost:3000');
+  res.redirect('https://stock-surfer.netlify.app');
 });
 
 // API Routes
