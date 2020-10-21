@@ -66,6 +66,10 @@ app.use(expressSession({
   resave: true,
   saveUninitialized: true,
   secret: process.env.REACT_APP_SESSION_SECRET,
+  cookie: {
+    sameSite: 'none',
+    secure: true
+  }
 }))
 app.use(passport.initialize());
 app.use(passport.session())
