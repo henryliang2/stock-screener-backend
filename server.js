@@ -7,7 +7,6 @@ const passport = require('passport');
 const cookieSession = require('cookie-session');
 const cookieParser = require('cookie-parser');
 require('dotenv').config(); 
-const User = require('./models/User.js');
 const RouteHandlers = require('./RouteHandlers');
 
 // initialize express
