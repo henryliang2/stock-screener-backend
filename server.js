@@ -23,7 +23,6 @@ passport.use(new GoogleStrategy({
   callbackURL: "/auth/google/callback"
 },
 async (accessToken, refreshToken, profile, done) => {
-  console.log(profile);
   let user = await User.findOne({userId: profile.id});
   if(user) done(null, user);
   else {
@@ -40,7 +39,6 @@ async (accessToken, refreshToken, profile, done) => {
 }));
 
 passport.serializeUser((user, done) => {
-  console.log(user.userId)
   done(null, user.userId);
 });
 
@@ -74,7 +72,7 @@ app.use(passport.session())
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors({
-  origin: "https://stock-surfer.netlify.app",
+  origin: "http://localhost:3000",
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true,
 }));
@@ -87,8 +85,8 @@ app.get('/auth/google',
 
 app.get('/auth/google/callback', 
   passport.authenticate('google', { 
-    successRedirect: 'https://stock-surfer.netlify.app',
-    failureRedirect: 'https://stock-surfer.netlify.app' 
+    successRedirect: 'http://localhost:3000',
+    failureRedirect: '/' 
   }),
   (req, res) => {
     res.redirect('/');
@@ -96,19 +94,19 @@ app.get('/auth/google/callback',
 
 app.get("/auth/logout", (req, res) => {
   req.logout();
-  res.redirect('https://stock-surfer.netlify.app');
+  res.redirect('http://localhost:3000');
 });
 
 // API Routes
 
 // Fetch user profile on user sign-in
 app.get('/sync', (req, res) => {
-  if(!req.user) { 
+  if(!req.session.user) { 
     res.send({}); 
     return null 
   };
 
-  User.findOne({userId: req.user.userId})
+  User.findOne({userId: req.session.user.userId})
   .then(user => { res.send(user) });
 })
 
