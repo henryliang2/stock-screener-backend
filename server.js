@@ -106,7 +106,7 @@ app.get('/sync', (req, res) => {
     return null 
   };
 
-  User.findOne({userId: req.session.user.userId})
+  User.findOne({userId: req.user.userId})
   .then(user => { res.send(user) });
 })
 
