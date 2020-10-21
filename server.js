@@ -8,6 +8,7 @@ const cookieSession = require('cookie-session');
 const cookieParser = require('cookie-parser');
 require('dotenv').config(); 
 const RouteHandlers = require('./RouteHandlers');
+const GoogleStrategy = require('passport-google-oauth2').Strategy;
 
 // initialize express
 
