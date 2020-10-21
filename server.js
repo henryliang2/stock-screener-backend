@@ -102,6 +102,7 @@ app.get("/auth/logout", (req, res) => {
 
 // Fetch user profile on user sign-in
 app.get('/sync', (req, res) => {
+  console.log(req)
   if(!req.user) { 
     res.send({}); 
     return null 
