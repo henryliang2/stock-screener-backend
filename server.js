@@ -85,8 +85,10 @@ app.enable("trust proxy");
 
 // Passport Routes
 
-app.get('/auth/google',
-  passport.authenticate('google', { scope: ['profile', 'email'] }));
+app.get('/auth/google', passport.authenticate('google', { 
+  scope: ['profile', 'email'],
+  failureRedirect: 'https://stock-surfer.netlify.app' 
+}));
 
 app.get('/auth/google/callback', 
   passport.authenticate('google', { 
