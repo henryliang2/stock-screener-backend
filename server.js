@@ -4,11 +4,11 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const User = require('./models/User.js');
 const passport = require('passport');
-const cookieSession = require('cookie-session');
 const cookieParser = require('cookie-parser');
 require('dotenv').config(); 
 const RouteHandlers = require('./RouteHandlers');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const expressSession = require('express-session');
 
 // initialize express
 
@@ -63,15 +63,12 @@ db.once('open', function() {
 
 // Middleware
 
-app.use(
-  cookieSession({
-    name: "session",
-    keys: [process.env.REACT_APP_SESSION_SECRET],
-    maxAge: 24 * 60 * 60 * 100,
-    secure: true
-  })
-);
 app.use(cookieParser());
+app.use(expressSession({ 
+  resave: true,
+  saveUninitialized: true,
+  secret: process.env.REACT_APP_SESSION_SECRET,
+}))
 app.use(passport.initialize());
 app.use(passport.session())
 app.use(bodyParser.json());
