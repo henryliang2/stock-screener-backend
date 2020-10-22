@@ -7,8 +7,8 @@ const passport = require('passport');
 const cookieParser = require('cookie-parser');
 require('dotenv').config(); 
 const RouteHandlers = require('./RouteHandlers');
-const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const expressSession = require('express-session');
+const PassportConfig = require('./PassportConfig');
 
 // initialize express
 
@@ -17,26 +17,7 @@ const port = process.env.PORT || 8080;
 
 // Passport Configuration
 
-passport.use(new GoogleStrategy({
-  clientID: process.env.REACT_APP_GOOGLE_CLIENT_ID,
-  clientSecret: process.env.REACT_APP_GOOGLE_CLIENT_SECRET,
-  callbackURL: "/auth/google/callback"
-},
-async (accessToken, refreshToken, profile, done) => {
-  let user = await User.findOne({userId: profile.id});
-  if(user) done(null, user);
-  else {
-    user = await User.create({
-      userId: profile.id,
-      displayName: profile.displayName,
-      email: profile.emails[0].value,
-      image: profile.photos[0].value,
-      stocks: []
-    })
-    
-    done(null, user);
-  }
-}));
+passport.use(PassportConfig.googleStrategy);
 
 passport.serializeUser((user, done) => {
   done(null, user.userId);
@@ -105,6 +86,10 @@ app.get("/auth/logout", (req, res) => {
 });
 
 // API Routes
+
+app.get('/', (req, res) => {
+  res.redirect('https://stock-surfer.netlify.app')
+})
 
 // Fetch user profile on user sign-in
 app.get('/sync', (req, res) => {
