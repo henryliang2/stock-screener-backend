@@ -43,8 +43,7 @@ const getCompanyNews = async (ticker) => {
         article.image = 'https://stocksurfer-server.herokuapp.com/stocksurfer.png'
       }
     });
-    const returnData = JSON.stringify({ newsArray: returnArray });
-    return returnData;
+    return { newsArray: returnArray };
   } catch(err) {
     console.log(err);
   }
