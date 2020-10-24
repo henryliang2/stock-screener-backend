@@ -35,15 +35,15 @@ const getCompanyNews = async (ticker) => {
       method: 'GET',
       headers: { 'X-Finnhub-Token' : process.env.REACT_APP_FINNHUB_API_KEY }
     })
-    const articles = await finnhubData.json();
-    let returnArray = articles.slice(0, 9);
-    returnArray.forEach((article, i) => {
+    let articles = await finnhubData.json();
+    articles = articles.slice(0, 9);
+    articles.forEach(article => {
       article.summary = article.summary.slice(0, 480) + '...'; // shorten description
-      if (article.image === 'null') {
+      if (article.image === 'null' || !article.image) {
         article.image = 'https://stocksurfer-server.herokuapp.com/stocksurfer.png'
       }
     });
-    return { newsArray: returnArray };
+    return { articles: returnArray };
   } catch(err) {
     console.log(err);
   }
@@ -51,8 +51,7 @@ const getCompanyNews = async (ticker) => {
 
 const getCompanyData = async (tickers) => {
   const fmpResponse = await fetch(`https://financialmodelingprep.com/api/v3/profile/${tickers}?apikey=${process.env.REACT_APP_FMP_API_KEY}`);
-  const filteredNews = fmpResponse.newsArray.filter(article => article.image)
-  const newsArray = await filteredNews.json();
+  const newsArray = await fmpResponse.json();
   return newsArray
 }
 
