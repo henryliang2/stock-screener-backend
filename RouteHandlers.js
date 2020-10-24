@@ -2,28 +2,27 @@ const fetch = require('node-fetch');
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
 
-const formatStockData = (stockObject) => {
+const formatStockData = (companyObject) => {
+    
   // Format Change String
-  const resultObject = stockObject.forEach(company => {
-    let changeString = company.changes.toFixed(2);
-    if (Math.sign(changeString) === 1 || Math.sign(changeString) === 0) {
-      company.changeString = `(+${changeString.toString()}%)`
-    } else { 
-      company.changeString = `(${changeString.toString()}%)`
-    }
+  let changeString = companyObject.changes.toFixed(2);
+  if (Math.sign(changeString) === 1 || Math.sign(changeString) === 0) {
+    companyObject.changeString = `(+${changeString.toString()}%)`
+  } else { 
+    companyObject.changeString = `(${changeString.toString()}%)`
+  }
 
-    // Formatting Market Cap String
-    const mktCapStrLength = company.mktCap.toString().length;
-    if (mktCapStrLength >= 13) company.mktCapStr = (company.mktCap / 1000000000000).toFixed(2) + ' Trillion'
-    else if (mktCapStrLength >= 10) company.mktCapStr = (company.mktCap / 1000000000).toFixed(2) + ' Billion'
-    else if (mktCapStrLength >= 7) company.mktCapStr = (company.mktCap / 1000000).toFixed(2) + ' Million'
-    else company.mktCapStr = company.mktCap.toString();
+  // Formatting Market Cap String
+  const mktCapStrLength = companyObject.mktCap.toString().length;
+  if (mktCapStrLength >= 13) companyObject.mktCapStr = (companyObject.mktCap / 1000000000000).toFixed(2) + ' Trillion'
+  else if (mktCapStrLength >= 10) companyObject.mktCapStr = (companyObject.mktCap / 1000000000).toFixed(2) + ' Billion'
+  else if (mktCapStrLength >= 7) companyObject.mktCapStr = (companyObject.mktCap / 1000000).toFixed(2) + ' Million'
+  else companyObject.mktCapStr = companyObject.mktCap.toString();
 
-    // Formatting Description String
-    company.shortDesc = company.description.slice(0, 360) + ' ...'
-  })
+  // Formatting Description String
+  companyObject.shortDesc = companyObject.description.slice(0, 360) + ' ...';
 
-  return resultObject;
+  return companyObject;
 }
 
 const searchByCriteria = async (initialValue, queryOptions) => {
