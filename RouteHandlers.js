@@ -78,7 +78,7 @@ const getCompanyNews = async (ticker) => {
 
 const getCompanyData = async (tickers) => {
   const fmpResponse = await fetch(`https://financialmodelingprep.com/api/v3/profile/${tickers}?apikey=${process.env.REACT_APP_FMP_API_KEY}`);
-  const stockData = await fmpResponse.json();
+  let stockData = await fmpResponse.json();
 
   stockData = stockData.forEach(company => {
     formatStockData(company)
