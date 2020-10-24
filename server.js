@@ -104,7 +104,7 @@ app.get('/sync', (req, res) => {
 })
 
 // Update database when user adds/removes stocks from collecton
-app.post('/set', (req, res) => {
+app.post('/update', (req, res) => {
   User.findOneAndUpdate(
     { userId: req.user.userId },
     { $set: { stocks: req.body.stocks } }
@@ -132,7 +132,7 @@ app.get('/quote/:ticker', async(req, res) => {
 })
 
 // Fetch news articles for a company by ticker
-app.get('/companynews/:ticker', async (req, res) => {
+app.get('/news/:ticker', async (req, res) => {
   const returnData = await RouteHandlers.getCompanyNews(req.params.ticker);
   res.json(returnData);
 })
