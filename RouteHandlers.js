@@ -18,7 +18,27 @@ const searchByCriteria = async (initialValue, queryOptions) => {
 
   const fmpResponse = await fetch(`https://financialmodelingprep.com/api/v3/profile/${tickers}?apikey=${process.env.REACT_APP_FMP_API_KEY}`);
   const stockData = await fmpResponse.json();
-  console.log(stockData);
+  
+  // Format Change String
+  stockData.forEach(company => {
+    let changeString = company.changes.toFixed(2);
+    if (Math.sign(changeString) === 1 || Math.sign(changeString) === 0) {
+      company.changeString = `(+${changeString.toString()}%)`
+    } else { 
+      company.changeString = `(${changeString.toString()}%)`
+    }
+
+    // Formatting Market Cap String
+    const mktCapStrLength = company.mktCap.toString().length;
+    if (mktCapStrLength >= 13) company.mktCapStr = (company.mktCap / 1000000000000).toFixed(2) + ' Trillion'
+    else if (mktCapStrLength >= 10) company.mktCapStr = (company.mktCap / 1000000000).toFixed(2) + ' Billion'
+    else if (mktCapStrLength >= 7) company.mktCapStr = (company.mktCap / 1000000).toFixed(2) + ' Million'
+    else company.mktCapStr = company.mktCap.toString();
+
+    // Formatting Description String
+    company.shortDesc = company.description.slice(0, 360) + ' ...'
+
+  })
   
   return { stockData, totalResultCount }
 }
