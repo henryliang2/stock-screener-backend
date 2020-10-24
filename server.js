@@ -95,7 +95,7 @@ app.get('/', (req, res) => {
 app.get('/sync', (req, res) => {
   console.log(req.user)
   if(!req.user) { 
-    res.send({}); 
+    res.json({}); 
     return null 
   };
 
@@ -115,26 +115,26 @@ app.post('/set', (req, res) => {
 app.get('/search/:initialValue/:queryOptions?', async (req, res) => {
   const { queryOptions, initialValue } = req.params;
   const returnedCompanies = await RouteHandlers.searchByCriteria(initialValue, queryOptions)
-  res.send(JSON.stringify(returnedCompanies));
+  res.json(returnedCompanies);
 })
 
 // Fetch data from FinancialModelingPrep for a list of companies 
 app.get('/companies/:tickers', async (req, res) => {
   const { tickers } = req.params;
   const stockData = await RouteHandlers.getCompanyData(tickers);
-  res.send(JSON.stringify({ stockData }));
+  res.json({ stockData });
 })
 
 app.get('/quote/:ticker', async(req, res) => {
   const { ticker } = req.params;
   const quoteData = await RouteHandlers.getQuote(ticker);
-  res.send(JSON.stringify({ quoteData }));
+  res.json({ quoteData });
 })
 
 // Fetch news articles for a company by ticker
 app.get('/companynews/:ticker', async (req, res) => {
   const returnData = await RouteHandlers.getCompanyNews(req.params.ticker);
-  res.send(returnData);
+  res.json(returnData);
 })
 
 app.listen(port, () => {
