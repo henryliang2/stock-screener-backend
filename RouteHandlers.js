@@ -2,6 +2,27 @@ const fetch = require('node-fetch');
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
 
+const formatStockData = (stockObject) => {
+  let changeString = stockObject.changes.toFixed(2);
+    if (Math.sign(changeString) === 1 || Math.sign(changeString) === 0) {
+      stockObject.changeString = `(+${changeString.toString()}%)`
+    } else { 
+      stockObject.changeString = `(${changeString.toString()}%)`
+    }
+
+  // Formatting Market Cap String
+  const mktCapStrLength = stockObject.mktCap.toString().length;
+  if (mktCapStrLength >= 13) stockObject.mktCapStr = (stockObject.mktCap / 1000000000000).toFixed(2) + ' Trillion'
+  else if (mktCapStrLength >= 10) stockObject.mktCapStr = (stockObject.mktCap / 1000000000).toFixed(2) + ' Billion'
+  else if (mktCapStrLength >= 7) stockObject.mktCapStr = (stockObject.mktCap / 1000000).toFixed(2) + ' Million'
+  else stockObject.mktCapStr = stockObject.mktCap.toString();
+
+  // Formatting Description String
+  stockObject.shortDesc = stockObject.description.slice(0, 360) + ' ...'
+
+  return stockObject;
+}
+
 const searchByCriteria = async (initialValue, queryOptions) => {
   const finvizResponse = await fetch(`https://finviz.com/screener.ashx?v=111&f=${queryOptions}&r=${initialValue}`);
   const finvizHtml = await finvizResponse.text();
@@ -20,28 +41,11 @@ const searchByCriteria = async (initialValue, queryOptions) => {
   let stockData = await fmpResponse.json();
 
   // Excludes ETFs
-  stockData = stockData.filter(company => (company.description != null && company.industry));
-  
-  // Format Change String
-  stockData.forEach(company => {
-    let changeString = company.changes.toFixed(2);
-    if (Math.sign(changeString) === 1 || Math.sign(changeString) === 0) {
-      company.changeString = `(+${changeString.toString()}%)`
-    } else { 
-      company.changeString = `(${changeString.toString()}%)`
-    }
-
-    // Formatting Market Cap String
-    const mktCapStrLength = company.mktCap.toString().length;
-    if (mktCapStrLength >= 13) company.mktCapStr = (company.mktCap / 1000000000000).toFixed(2) + ' Trillion'
-    else if (mktCapStrLength >= 10) company.mktCapStr = (company.mktCap / 1000000000).toFixed(2) + ' Billion'
-    else if (mktCapStrLength >= 7) company.mktCapStr = (company.mktCap / 1000000).toFixed(2) + ' Million'
-    else company.mktCapStr = company.mktCap.toString();
-
-    // Formatting Description String
-    company.shortDesc = company.description.slice(0, 360) + ' ...'
-
-  })
+  stockData = stockData
+    .filter(company => (company.description != null && company.industry))
+    .forEach(company => {
+      formatStockData(company)
+    })
   
   return { stockData, totalResultCount }
 }
@@ -74,18 +78,13 @@ const getCompanyNews = async (ticker) => {
 
 const getCompanyData = async (tickers) => {
   const fmpResponse = await fetch(`https://financialmodelingprep.com/api/v3/profile/${tickers}?apikey=${process.env.REACT_APP_FMP_API_KEY}`);
-  const data = await fmpResponse.json();
+  const stockData = await fmpResponse.json();
 
-  data.forEach(company => {
-    let changeString = company.changes.toFixed(2);
-    if (Math.sign(changeString) === 1 || Math.sign(changeString) === 0) {
-      company.changeString = `(+${changeString.toString()}%)`
-    } else { 
-      company.changeString = `(${changeString.toString()}%)`
-    }
+  stockData = stockData.forEach(company => {
+    formatStockData(company)
   })
 
-  return data
+  return stockData
 }
 
 const getQuote = async (ticker) => {
