@@ -92,7 +92,7 @@ app.get('/', (req, res) => {
 })
 
 // Fetch user profile on user sign-in
-app.get('/sync', (req, res) => {
+app.get('/user/sync', (req, res) => {
   console.log(req.user)
   if(!req.user) { 
     res.json({}); 
@@ -104,7 +104,7 @@ app.get('/sync', (req, res) => {
 })
 
 // Update database when user adds/removes stocks from collecton
-app.post('/update', (req, res) => {
+app.post('/user/update', (req, res) => {
   User.findOneAndUpdate(
     { userId: req.user.userId },
     { $set: { stocks: req.body.stocks } })
@@ -119,27 +119,27 @@ app.post('/update', (req, res) => {
 })
 
 // Query Finviz, then return a list of stocks matching constraints
-app.get('/search/:initialValue/:queryOptions?', async (req, res) => {
+app.get('/api/search/:initialValue/:queryOptions?', async (req, res) => {
   const { queryOptions, initialValue } = req.params;
   const returnedCompanies = await RouteHandlers.searchByCriteria(initialValue, queryOptions)
   res.json(returnedCompanies);
 })
 
 // Fetch data from FinancialModelingPrep for a list of companies 
-app.get('/companies/:tickers', async (req, res) => {
+app.get('/api/companies/:tickers', async (req, res) => {
   const { tickers } = req.params;
   const stockData = await RouteHandlers.getCompanyData(tickers);
   res.json({ stockData });
 })
 
-app.get('/quote/:ticker', async(req, res) => {
+app.get('/api/quote/:ticker', async(req, res) => {
   const { ticker } = req.params;
   const quoteData = await RouteHandlers.getQuote(ticker);
   res.json({ quoteData });
 })
 
 // Fetch news articles for a company by ticker
-app.get('/news/:ticker', async (req, res) => {
+app.get('/api/news/:ticker', async (req, res) => {
   const returnData = await RouteHandlers.getCompanyNews(req.params.ticker);
   res.json(returnData);
 })
