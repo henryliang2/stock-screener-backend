@@ -51,7 +51,7 @@ const getCompanyNews = async (ticker) => {
 
 const getCompanyData = async (tickers) => {
   const fmpResponse = await fetch(`https://financialmodelingprep.com/api/v3/profile/${tickers}?apikey=${process.env.REACT_APP_FMP_API_KEY}`);
-  const filteredNews = fmpResponse.filter(article => article.image)
+  const filteredNews = fmpResponse.newsArray.filter(article => article.image)
   const newsArray = await filteredNews.json();
   return newsArray
 }
