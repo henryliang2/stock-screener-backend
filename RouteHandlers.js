@@ -51,8 +51,18 @@ const getCompanyNews = async (ticker) => {
 
 const getCompanyData = async (tickers) => {
   const fmpResponse = await fetch(`https://financialmodelingprep.com/api/v3/profile/${tickers}?apikey=${process.env.REACT_APP_FMP_API_KEY}`);
-  const newsArray = await fmpResponse.json();
-  return newsArray
+  const data = await fmpResponse.json();
+
+  data.forEach(company => {
+    let changeString = company.changes.toFixed(2);
+    if (Math.sign(changeString) === 1 || Math.sign(changeString) === 0) {
+      company.changeString = `(+${changeString.toString()}%)`
+    } else { 
+      company.changeString = `(${changeString.toString()}%)`
+    }
+  })
+
+  return data
 }
 
 const getQuote = async (ticker) => {
