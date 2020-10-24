@@ -107,8 +107,15 @@ app.get('/sync', (req, res) => {
 app.post('/update', (req, res) => {
   User.findOneAndUpdate(
     { userId: req.user.userId },
-    { $set: { stocks: req.body.stocks } }
-  ).then(console.log)
+    { $set: { stocks: req.body.stocks } })
+    .then(() => { 
+      console.log('success')
+      res.send('success')
+    })
+    .catch(() => { 
+      console.log('fail')
+      res.send('fail')
+    })
 })
 
 // Query Finviz, then return a list of stocks matching constraints
