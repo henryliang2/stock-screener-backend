@@ -17,7 +17,10 @@ const searchByCriteria = async (initialValue, queryOptions) => {
   totalResultCount = parseInt(totalResultCount);
 
   const fmpResponse = await fetch(`https://financialmodelingprep.com/api/v3/profile/${tickers}?apikey=${process.env.REACT_APP_FMP_API_KEY}`);
-  const stockData = await fmpResponse.json();
+  let stockData = await fmpResponse.json();
+
+  // Excludes ETFs
+  stockData = stockData.filter(company => (company.description != null && company.industry));
   
   // Format Change String
   stockData.forEach(company => {
