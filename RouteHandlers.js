@@ -30,6 +30,13 @@ const searchByCriteria = async (initialValue, queryOptions) => {
   const finvizHtml = await finvizResponse.text();
   const finvizDOM = new JSDOM(finvizHtml);
 
+  if(finvizDOM.window.document.getElementsByClassName('screener-link-primary').length === 0) {
+    return { 
+      stockData: { error: 'no results found' }, 
+      totalResultCount: 0 
+    }
+  }
+
   const tickers = Array.from(finvizDOM.window.document.getElementsByClassName('screener-link-primary'))
     .map(node => node.textContent)
     .join(',');
