@@ -32,9 +32,7 @@ const searchByCriteria = async (initialValue, queryOptions) => {
 
   if(finvizDOM.window.document.getElementsByClassName('screener-link-primary').length === 0) {
     return { 
-      stockData: { error: 'no results found' }, 
-      totalResultCount: 0 
-    }
+      stockData: { error: 'no results found' }, totalResultCount: 0 }
   }
 
   const tickers = Array.from(finvizDOM.window.document.getElementsByClassName('screener-link-primary'))
@@ -51,6 +49,12 @@ const searchByCriteria = async (initialValue, queryOptions) => {
 
   // Excludes ETFs
   stockData = stockData.filter(company => (company.description != null && company.industry));
+
+  if (stockData.length === 0) { 
+    return { 
+      stockData: { error: 'no results found' }, totalResultCount: 0 
+    } 
+  }
   
   stockData = stockData.map(company => formatStockData(company));
   
